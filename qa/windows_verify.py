@@ -40,6 +40,10 @@ def main():
  for row in rows:
   if row["pending_id"]=="PW-B2":row["priority"]="120"
  with p.open("w",encoding="utf-8",newline="") as h:w=csv.DictWriter(h,fieldnames=rows[0].keys(),lineterminator="\n");w.writeheader();w.writerows(rows)
+ plan=pos/"input_data/contracts/transaction_plan.csv";plan_rows=list(csv.DictReader(plan.open(encoding="utf-8",newline="")))
+ for row in plan_rows:
+  if row["tx_id"]=="TX04_PROMOTE_B_13_BY_TIME":row["expected"]="PW-B2"
+ with plan.open("w",encoding="utf-8",newline="") as h:w=csv.DictWriter(h,fieldnames=plan_rows[0].keys(),lineterminator="\n");w.writeheader();w.writerows(plan_rows)
  c=build(pos/"input_data",pos/"output","release_positive")
  if c.returncode:raise AssertionError(c.stdout+c.stderr)
  decisions={r["pending_id"]:r["decision"] for r in csv.DictReader((pos/"output/results/pending_window_decisions.csv").open())}

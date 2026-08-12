@@ -1,4 +1,0 @@
-lane_id,edge_scope,opens_at,closes_at
-lane-a,ap-southeast-edge,08:00,18:00
-lane-b,eu-central-edge,08:00,18:00
-lane-c,us-west-edge,10:00,20:00
