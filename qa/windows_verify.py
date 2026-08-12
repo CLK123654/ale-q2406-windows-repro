@@ -24,7 +24,7 @@ def build(i,o,d):
  admin(f"DROP DATABASE IF EXISTS {d} WITH (FORCE)");admin(f"CREATE DATABASE {d}")
  return subprocess.run([sys.executable,str(ROOT/"implementation/build_delivery.py"),"--input",str(i),"--output",str(o),"--psql",PSQL,"--database-url",f"postgresql://postgres:root@127.0.0.1:5432/{d}"],text=True,capture_output=True,timeout=300)
 def main():
- reset(RUN);E.mkdir(exist_ok=True);expected=json.loads((ROOT/"qa/expected_hashes.json").read_text());actual={n:sha(TASK/n) for n in expected}
+ reset(RUN);E.mkdir(exist_ok=True);expected=json.loads((ROOT/"qa/expected_hashes.json").read_text(encoding="utf-8"));actual={n:sha(TASK/n) for n in expected}
  if actual!=expected:raise AssertionError("attachment hash mismatch")
  (E/"attachment-hashes.json").write_text(json.dumps(actual,ensure_ascii=False,indent=2)+"\n")
  v=subprocess.run([PSQL,"--version"],text=True,capture_output=True);assert v.returncode==0 and " 17." in v.stdout
@@ -51,4 +51,3 @@ def main():
  s={"result":"PASS","commit_sha":os.getenv("GITHUB_SHA"),"workflow_run_id":os.getenv("GITHUB_RUN_ID"),"runner_image":os.getenv("ImageOS"),"main_software":{"name":"PostgreSQL Client","database":"PostgreSQL17","version":v.stdout.strip(),"executed":True},"attachment_sha256":actual,"clean_directory_count":2,"process_runs_per_directory":2,"clean_runs":clean,"positive_mutation":"PASS","negative_case":"PASS","formal_network":{"python_outbound_blocked":True,"psql_internet_blocked":True,"loopback_only":True,"external_services_used":False},"linux_executables":[],"linux_executables_executed":False}
  (E/"windows-summary.json").write_text(json.dumps(s,ensure_ascii=False,indent=2)+"\n")
 if __name__=="__main__":main()
-
