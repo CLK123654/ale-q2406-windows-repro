@@ -1,0 +1,11 @@
+node_modules
+evidence
+windows-runs
+work-reference
+workbook-renders
+qa/reference-download*
+qa/final-evidence*
+task/*.inspect.ndjson
+task/.qa
+.DS_Store
+
