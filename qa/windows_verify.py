@@ -26,7 +26,7 @@ def build(i,o,d):
 def main():
  reset(RUN);E.mkdir(exist_ok=True);expected=json.loads((ROOT/"qa/expected_hashes.json").read_text(encoding="utf-8"));actual={n:sha(TASK/n) for n in expected}
  if actual!=expected:raise AssertionError("attachment hash mismatch")
- (E/"attachment-hashes.json").write_text(json.dumps(actual,ensure_ascii=False,indent=2)+"\n")
+ (E/"attachment-hashes.json").write_text(json.dumps(actual,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  v=subprocess.run([PSQL,"--version"],text=True,capture_output=True);assert v.returncode==0 and " 17." in v.stdout
  ref=RUN/"reference";extract(TASK/"reference.zip",ref);expected_output=ref/"output";clean=[]
  for ri,label in enumerate(["clean directory a with spaces","clean directory b with spaces"],1):
@@ -44,10 +44,10 @@ def main():
  if c.returncode:raise AssertionError(c.stdout+c.stderr)
  decisions={r["pending_id"]:r["decision"] for r in csv.DictReader((pos/"output/results/pending_window_decisions.csv").open())}
  if decisions["PW-B2"]!="PROMOTED" or norm(pos/"output/results/pending_window_decisions.csv")==norm(expected_output/"results/pending_window_decisions.csv"):raise AssertionError("positive mutation did not change winner")
- (E/"positive-case.json").write_text(json.dumps({"mutation":"PW-B2优先级改为120","new_winner":"PW-B2","passed":True},ensure_ascii=False,indent=2)+"\n")
- neg=RUN/"negative duplicate lane";extract(TASK/"输入数据包.zip",neg);p=neg/"input_data/data/release_lanes.csv";lines=p.read_text().splitlines();p.write_text("\n".join(lines+[lines[1]])+"\n");out=neg/"output";out.mkdir();(out/"stale.txt").write_text("stale");c=build(neg/"input_data",out,"release_negative")
+ (E/"positive-case.json").write_text(json.dumps({"mutation":"PW-B2优先级改为120","new_winner":"PW-B2","passed":True},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ neg=RUN/"negative duplicate lane";extract(TASK/"输入数据包.zip",neg);p=neg/"input_data/data/release_lanes.csv";lines=p.read_text(encoding="utf-8").splitlines();p.write_text("\n".join(lines+[lines[1]])+"\n",encoding="utf-8");out=neg/"output";out.mkdir();(out/"stale.txt").write_text("stale",encoding="utf-8");c=build(neg/"input_data",out,"release_negative")
  if c.returncode==0 or out.exists():raise AssertionError("duplicate lane did not fail closed")
- (E/"negative-case.log").write_text(f"return_code={c.returncode}\n{c.stdout}{c.stderr}")
+ (E/"negative-case.log").write_text(f"return_code={c.returncode}\n{c.stdout}{c.stderr}",encoding="utf-8")
  s={"result":"PASS","commit_sha":os.getenv("GITHUB_SHA"),"workflow_run_id":os.getenv("GITHUB_RUN_ID"),"runner_image":os.getenv("ImageOS"),"main_software":{"name":"PostgreSQL Client","database":"PostgreSQL17","version":v.stdout.strip(),"executed":True},"attachment_sha256":actual,"clean_directory_count":2,"process_runs_per_directory":2,"clean_runs":clean,"positive_mutation":"PASS","negative_case":"PASS","formal_network":{"python_outbound_blocked":True,"psql_internet_blocked":True,"loopback_only":True,"external_services_used":False},"linux_executables":[],"linux_executables_executed":False}
- (E/"windows-summary.json").write_text(json.dumps(s,ensure_ascii=False,indent=2)+"\n")
+ (E/"windows-summary.json").write_text(json.dumps(s,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 if __name__=="__main__":main()
