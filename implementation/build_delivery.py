@@ -141,7 +141,7 @@ def main() -> None:
     summary={"status":"READY" if all(row["matches_expected"]=="true" for row in outcomes) and int(scalar(args.psql,args.database_url,"SELECT count(*) FROM release_ops.release_window l JOIN release_ops.release_window r ON l.lane_id=r.lane_id AND l.window_id<r.window_id AND l.status='ACTIVE' AND r.status='ACTIVE' AND l.slot&&r.slot"))==0 else "HOLD","transaction_rows":len(outcomes),"window_rows":int(scalar(args.psql,args.database_url,"SELECT count(*) FROM release_ops.release_window")),"pending_rows":int(scalar(args.psql,args.database_url,"SELECT count(*) FROM release_ops.pending_window")),"active_overlap_pairs":0}
     (results/"handover.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     (output/"HANDOVER.md").write_text("# 发布窗口处理摘要\n\ninput_data目录包含通道、窗口、排队请求和事务计划。\n\n使用tools/build_delivery.py连接空数据库。results目录保存事务、最终窗口、排队决定、冲突及边界结果。handover.json状态为READY时，可继续本批排程。\n",encoding="utf-8")
-    if summary["status"]!="READY": raise RuntimeError("release window batch is not ready")
+    if summary["status"]!="READY": raise RuntimeError("release window batch is not ready: "+json.dumps(outcomes,ensure_ascii=False))
     completed_flag["value"]=True
 
 
